@@ -10,13 +10,15 @@ import UIKit
 import FirebaseAuth
 import Firebase
 
-class LoginViewController:UIViewController{
+class LoginViewController:UIViewController, UITextFieldDelegate{
     @IBOutlet weak var errorLabel: UILabel!
     
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var signupButton: UIButton!
+    
+    var activeTextField: UITextField? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +27,13 @@ class LoginViewController:UIViewController{
         let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
         self.view.addGestureRecognizer(tap)
         self.navigationController?.setNavigationBarHidden(false, animated: true)
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
         
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(sender:)), name: UIResponder.keyboardWillShowNotification, object: nil);
+
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(sender:)), name: UIResponder.keyboardWillHideNotification, object: nil);
+
         Auth.auth().addStateDidChangeListener { auth, user in
           if let user = user {
             print("automatically signed in with UID: \(user.uid)")
@@ -60,6 +68,19 @@ class LoginViewController:UIViewController{
         formatButton(button: signupButton)
     }
     
+    func textFieldShouldReturn(_ scoreText: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return true
+    }
+    
+    @objc func keyboardWillShow(sender: NSNotification) {
+        self.view.frame.origin.y = -150 // Move view 150 points upward
+    }
+
+    @objc func keyboardWillHide(sender: NSNotification) {
+         self.view.frame.origin.y = 0 // Move view to original position
+    }
+    
     @IBAction func didLogin(_ sender: Any) {
         //setting up Firestore for data retrieval
         Firestore.firestore().settings = FirestoreSettings()
@@ -68,7 +89,7 @@ class LoginViewController:UIViewController{
         // Create cleaned versions of the text field
         let email = emailTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
         let password = passwordTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         // Signing in the user
         Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
             
@@ -103,3 +124,4 @@ class LoginViewController:UIViewController{
         view.window?.makeKeyAndVisible()
     }
 }
+

@@ -127,6 +127,7 @@ class UserInfoViewController : UIViewController, UITextFieldDelegate, UICollecti
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        formatGesture()
         
         //optional: reorder by price
         items.sort(by: {
@@ -186,6 +187,17 @@ class UserInfoViewController : UIViewController, UITextFieldDelegate, UICollecti
         pointsLabel.text = "Points: \(Constants.points ?? 0)"
         pointsLabel.font = UIFont(name: "NanumPen", size: 35)
         pointsLabel.textColor = UIColor(cgColor: Constants.red)
+    }
+    
+    func formatGesture() {
+        let rightRecognizer = UISwipeGestureRecognizer(target: self, action:
+        #selector(executeSwipe(_:)))
+        rightRecognizer.direction = .right
+        self.view.addGestureRecognizer(rightRecognizer)
+    }
+    
+    @objc func executeSwipe(_ sender: UISwipeGestureRecognizer) {
+        popToPrevious()
     }
     
     @objc private func popToPrevious() {

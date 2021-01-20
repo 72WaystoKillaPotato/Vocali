@@ -28,7 +28,7 @@ class ChallengeViewController: UIViewController {
             print (didLoad)
         }
         generateWord()
-        
+        formatGesture()
         let leftButton = UIBarButtonItem(title: "", style: .plain, target: self, action: #selector(popToPrevious))
         leftButton.image = UIImage(systemName: "chevron.left", withConfiguration: UIImage.SymbolConfiguration(pointSize: 16, weight: .bold))
         leftButton.tintColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
@@ -41,6 +41,17 @@ class ChallengeViewController: UIViewController {
     
     @objc private func popToPrevious() {
         navigationController?.popViewController(animated: true)
+    }
+    
+    func formatGesture() {
+        let rightRecognizer = UISwipeGestureRecognizer(target: self, action:
+        #selector(executeSwipe(_:)))
+        rightRecognizer.direction = .right
+        self.view.addGestureRecognizer(rightRecognizer)
+    }
+    
+    @objc func executeSwipe(_ sender: UISwipeGestureRecognizer) {
+        popToPrevious()
     }
     
     func setupUI(){
@@ -153,6 +164,7 @@ class ChallengeViewController: UIViewController {
         var challengeArray: Array<String> = []
         var suggestionArray: Array<String> = []
         let randomNum = Int.random(in: 0..<30)
+        //let randomNum = 13
         var challenge: String = ""
         //get challenges from db
         let docRef = db.collection("challenges").document("oneMonth")

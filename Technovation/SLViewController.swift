@@ -10,7 +10,7 @@ import UIKit
 import FirebaseAuth
 import Firebase
 
-class SLViewController : UIViewController, UIGestureRecognizerDelegate{
+class SLViewController : UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate {
     
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
@@ -25,6 +25,13 @@ class SLViewController : UIViewController, UIGestureRecognizerDelegate{
         self.navigationController?.setNavigationBarHidden(false, animated: true)
         formatUI()
         errorLabel.alpha = 0
+        
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(sender:)), name: UIResponder.keyboardWillShowNotification, object: nil);
+
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(sender:)), name: UIResponder.keyboardWillHideNotification, object: nil);
     }
     
     func formatUI(){
@@ -38,10 +45,23 @@ class SLViewController : UIViewController, UIGestureRecognizerDelegate{
         self.navigationItem.leftBarButtonItem = leftButton
     }
     
+    func textFieldShouldReturn(_ scoreText: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return true
+    }
+    
     @objc private func popToPrevious() {
         navigationController?.popViewController(animated: true)
     }
     
+    @objc func keyboardWillShow(sender: NSNotification) {
+        self.view.frame.origin.y = -70 // Move view 150 points upward
+    }
+
+    @objc func keyboardWillHide(sender: NSNotification) {
+         self.view.frame.origin.y = 0 // Move view to original position
+    }
+
     @IBAction func didCreateAccount(_ sender: Any) {
         // Validate the fields
         let error = validateFields()
